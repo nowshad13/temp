@@ -31,14 +31,17 @@
             <form id="createForm" method="post" asp-action="CreateData" asp-controller="Home">
                 @Html.AntiForgeryToken()
                 <div class="mb-3">
-                    <label>Database name (will be created if supported)</label>
-                    <input class="form-control" id="databaseName" name="DatabaseName" value="@Model.DatabaseName" />
+                    <label style="color: black; font-weight: 600;">Database name (will be created if supported)</label>
+                    <input class="form-control" id="databaseName" name="DatabaseName" value="@Model.DatabaseName" style="border: 2px solid black;"/>
                 </div>
 
                 <div class="mb-3">
-                    <label>Table name</label>
-                    <input class="form-control" id="tableName" name="TableName" value="@Model.TableName" required />
-                </div>
+    <label style="color: black; font-weight: 600;">Table name</label>
+    <input class="form-control" id="tableName" name="TableName"
+           value="@Model.TableName" required
+           style="border: 2px solid black;" />
+</div>
+
 
                 <hr />
 
