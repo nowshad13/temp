@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DbConnectionTester</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/DbConnectionTester.styles.css" asp-append-version="true" />
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #000428, #004e92);
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+        }
+
+        /* ✅ Navbar Styling */
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            height: 50px; /* Reduced height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+
+        .navbar-brand:hover {
+            color: #00c6ff;
+        }
+
+        .container {
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+
+        footer {
+            text-align: center;
+            color: #aaa;
+            background: transparent;
+            padding: 10px 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    
+
+    <div class="container">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer>
+        &copy; 2025 - DbConnectionTester
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

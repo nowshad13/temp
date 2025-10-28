@@ -1,0 +1,218 @@
+@model DbConnectionTester.Models.CreateTableModel
+@{
+    ViewData["Title"] = "Create Table and Insert Data";
+}
+
+<link rel="stylesheet" href="~/css/colorful-db.css" />
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-10">
+        <div class="card p-3">
+            <h3>Create database / table and insert rows</h3>
+
+            @if (ViewBag.Warning != null)
+            {
+                <div class="alert alert-warning">@ViewBag.Warning</div>
+            }
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @foreach (var e in ViewData.ModelState.Values)
+                    {
+                        foreach (var err in e.Errors)
+                        {
+                            <div>@err.ErrorMessage</div>
+                        }
+                    }
+                </div>
+            }
+
+            <form id="createForm" method="post" asp-action="CreateData" asp-controller="Home">
+                @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <label>Database name (will be created if supported)</label>
+                    <input class="form-control" id="databaseName" name="DatabaseName" value="@Model.DatabaseName" />
+                </div>
+
+                <div class="mb-3">
+                    <label>Table name</label>
+                    <input class="form-control" id="tableName" name="TableName" value="@Model.TableName" required />
+                </div>
+
+                <hr />
+
+                <div>
+                    <h5>Columns</h5>
+                    <div id="columnsArea"></div>
+                    <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addColumn()">+ Add column</button>
+                </div>
+
+                <hr />
+
+                <div>
+                    <h5>Rows</h5>
+                    <div id="rowsArea"></div>
+                    <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addRow()">+ Add row</button>
+                </div>
+
+                <input type="hidden" name="payload" id="payload" />
+
+                <div class="mt-3">
+                    <button type="button" class="btn btn-success" onclick="submitPayload()">Create DB / Table & Insert</button>
+                    <a class="btn btn-secondary" asp-action="Index">Back</a>
+                </div>
+            </form>
+
+            @* Display output table if present *@
+            @if (ViewBag.ReadTable != null)
+            {
+                var dt = (System.Data.DataTable)ViewBag.ReadTable;
+                <hr />
+                <h5>Inserted data preview</h5>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            @foreach (System.Data.DataColumn col in dt.Columns)
+                            {
+                                <th>@col.ColumnName</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (System.Data.DataRow row in dt.Rows)
+                        {
+                            <tr>
+                                @foreach (var item in row.ItemArray)
+                                {
+                                    <td>@item</td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    // keep simple arrays of column names and rows
+    let columns = [];
+    let rows = [];
+
+    function addColumn(name = '') {
+        const idx = columns.length;
+        columns.push(name || `Column${idx + 1}`);
+        renderColumns();
+    }
+
+    function removeColumn(index) {
+        columns.splice(index, 1);
+        // remove cell values in each row at that index
+        for (let r of rows) {
+            r.splice(index, 1);
+        }
+        renderColumns();
+        renderRows();
+    }
+
+    function renderColumns() {
+        const area = document.getElementById('columnsArea');
+        area.innerHTML = '';
+        columns.forEach((c, i) => {
+            const div = document.createElement('div');
+            div.className = 'input-group mb-2';
+            div.innerHTML = `
+                <input class="form-control" value="${c}" onchange="updateColumnName(${i}, this.value)" />
+                <button type="button" class="btn btn-danger" onclick="removeColumn(${i})">x</button>
+            `;
+            area.appendChild(div);
+        });
+        if (columns.length === 0) addColumn();
+    }
+
+    function updateColumnName(i, newName) {
+        columns[i] = newName;
+    }
+
+    function addRow() {
+        if (columns.length === 0) { addColumn(); }
+        const newRow = [];
+        for (let i = 0; i < columns.length; i++) newRow.push('');
+        rows.push(newRow);
+        renderRows();
+    }
+
+    function removeRow(idx) {
+        rows.splice(idx, 1);
+        renderRows();
+    }
+
+    function renderRows() {
+        const area = document.getElementById('rowsArea');
+        area.innerHTML = '';
+        rows.forEach((r, ri) => {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'mb-2';
+            // build inputs for each column
+            let inner = '<div class="d-flex gap-2">';
+            r.forEach((cell, ci) => {
+                inner += `<input class="form-control" placeholder="${columns[ci] || 'col'}" value="${cell}" onchange="updateCell(${ri}, ${ci}, this.value)" />`;
+            });
+            inner += `<button type="button" class="btn btn-danger" onclick="removeRow(${ri})">x</button></div>`;
+            rowDiv.innerHTML = inner;
+            area.appendChild(rowDiv);
+        });
+
+        // If there are no rows, show a helpful hint
+        if (rows.length === 0) {
+            const hint = document.createElement('div');
+            hint.className = 'text-muted';
+            hint.textContent = 'No rows yet. Click "+ Add row" to add a row.';
+            area.appendChild(hint);
+        }
+    }
+
+    function updateCell(r, c, value) {
+        rows[r][c] = value;
+    }
+
+    function submitPayload() {
+        // refresh column names from inputs
+        // ensure columns array matches DOM
+        const columnsArea = document.getElementById('columnsArea');
+        const inputEls = columnsArea.querySelectorAll('input.form-control');
+        inputEls.forEach((el, idx) => columns[idx] = el.value.trim());
+
+        // if there are no rows, we still may want to create table (empty) - allowed
+        const model = {
+            databaseName: document.getElementById('databaseName').value.trim(),
+            tableName: document.getElementById('tableName').value.trim(),
+            columns: columns,
+            rows: rows
+        };
+
+        // basic validation
+        if (!model.tableName) {
+            alert('Table name required.');
+            return;
+        }
+        if (!model.columns || model.columns.length === 0) {
+            alert('At least one column required.');
+            return;
+        }
+
+        document.getElementById('payload').value = JSON.stringify(model);
+        document.getElementById('createForm').submit();
+    }
+
+    // initial render
+    (function init() {
+        // populate defaults from server model if any
+        const serverColumns = @Newtonsoft.Json.JsonConvert.SerializeObject(Model.Columns ?? new List<string>());
+        // but we previously didn't set columns; keep it dynamic
+        addColumn();
+        addRow();
+    })();
+</script>

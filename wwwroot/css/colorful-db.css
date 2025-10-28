@@ -1,0 +1,93 @@
+body {
+    background: linear-gradient(135deg, #ff6a00, #ee0979, #00c6ff, #0072ff);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.form-container {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.form-title {
+    background: linear-gradient(90deg, #ff6a00, #ee0979, #00c6ff, #00ff99);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 28px;
+    animation: shine 3s infinite linear;
+}
+
+@keyframes shine {
+    from { background-position: 0% }
+    to { background-position: 200% }
+}
+
+.form-label {
+    color: #fff;
+    font-weight: 700;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+}
+
+.form-control, .form-select {
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: 2px solid transparent;
+    transition: all 0.4s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #00ffcc;
+    box-shadow: 0 0 12px rgba(0, 255, 200, 0.6);
+    transform: scale(1.02);
+}
+
+.btn-primary {
+    background: linear-gradient(to right, #ff512f, #dd2476, #24c6dc, #514a9d);
+    border: none;
+    font-weight: bold;
+    border-radius: 50px;
+    padding: 12px;
+    width: 100%;
+    transition: all 0.4s ease;
+    color: white;
+    background-size: 300% 100%;
+}
+
+.btn-primary:hover {
+    background-position: right center;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px) scale(1.03);
+}
+
+.alert {
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 16px;
+    text-align: center;
+    padding: 15px;
+}
+
+.alert-success {
+    background: linear-gradient(45deg, #56ab2f, #a8e063);
+    color: #fff;
+}
+
+.alert-danger {
+    background: linear-gradient(45deg, #ff512f, #dd2476);
+    color: #fff;
+}
