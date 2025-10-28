@@ -46,7 +46,7 @@
                 <hr />
 
                 <div>
-                    <h5>Columns</h5>
+                    <h5 style="color: black; font-weight: 600;">Columns</h5>
                     <div id="columnsArea"></div>
                     <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addColumn()">+ Add column</button>
                 </div>
@@ -54,7 +54,7 @@
                 <hr />
 
                 <div>
-                    <h5>Rows</h5>
+                    <h5 style="color: black; font-weight: 600;">Rows</h5>
                     <div id="rowsArea"></div>
                     <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addRow()">+ Add row</button>
                 </div>
@@ -112,7 +112,6 @@
 
     function removeColumn(index) {
         columns.splice(index, 1);
-        // remove cell values in each row at that index
         for (let r of rows) {
             r.splice(index, 1);
         }
@@ -127,12 +126,13 @@
             const div = document.createElement('div');
             div.className = 'input-group mb-2';
             div.innerHTML = `
-                <input class="form-control" value="${c}" onchange="updateColumnName(${i}, this.value)" />
+                <input class="form-control custom-input" value="${c}" onchange="updateColumnName(${i}, this.value)" />
                 <button type="button" class="btn btn-danger" onclick="removeColumn(${i})">x</button>
             `;
             area.appendChild(div);
         });
         if (columns.length === 0) addColumn();
+        applyCustomStyle(); // <-- apply black border
     }
 
     function updateColumnName(i, newName) {
@@ -158,23 +158,23 @@
         rows.forEach((r, ri) => {
             const rowDiv = document.createElement('div');
             rowDiv.className = 'mb-2';
-            // build inputs for each column
             let inner = '<div class="d-flex gap-2">';
             r.forEach((cell, ci) => {
-                inner += `<input class="form-control" placeholder="${columns[ci] || 'col'}" value="${cell}" onchange="updateCell(${ri}, ${ci}, this.value)" />`;
+                inner += `<input class="form-control custom-input" placeholder="${columns[ci] || 'col'}" value="${cell}" onchange="updateCell(${ri}, ${ci}, this.value)" />`;
             });
             inner += `<button type="button" class="btn btn-danger" onclick="removeRow(${ri})">x</button></div>`;
             rowDiv.innerHTML = inner;
             area.appendChild(rowDiv);
         });
 
-        // If there are no rows, show a helpful hint
         if (rows.length === 0) {
             const hint = document.createElement('div');
             hint.className = 'text-muted';
             hint.textContent = 'No rows yet. Click "+ Add row" to add a row.';
             area.appendChild(hint);
         }
+
+        applyCustomStyle(); // <-- apply black border
     }
 
     function updateCell(r, c, value) {
@@ -182,13 +182,10 @@
     }
 
     function submitPayload() {
-        // refresh column names from inputs
-        // ensure columns array matches DOM
         const columnsArea = document.getElementById('columnsArea');
         const inputEls = columnsArea.querySelectorAll('input.form-control');
         inputEls.forEach((el, idx) => columns[idx] = el.value.trim());
 
-        // if there are no rows, we still may want to create table (empty) - allowed
         const model = {
             databaseName: document.getElementById('databaseName').value.trim(),
             tableName: document.getElementById('tableName').value.trim(),
@@ -196,7 +193,6 @@
             rows: rows
         };
 
-        // basic validation
         if (!model.tableName) {
             alert('Table name required.');
             return;
@@ -210,12 +206,18 @@
         document.getElementById('createForm').submit();
     }
 
-    // initial render
+    // Apply consistent black border to all inputs
+    function applyCustomStyle() {
+        document.querySelectorAll('.custom-input').forEach(el => {
+            el.style.border = '2px solid black';
+            el.style.borderRadius = '6px';
+        });
+    }
+
     (function init() {
-        // populate defaults from server model if any
-        const serverColumns = @Newtonsoft.Json.JsonConvert.SerializeObject(Model.Columns ?? new List<string>());
-        // but we previously didn't set columns; keep it dynamic
         addColumn();
         addRow();
+        applyCustomStyle();
     })();
 </script>
+
